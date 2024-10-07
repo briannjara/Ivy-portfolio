@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { FaLinkedin, FaKaggle, FaEnvelope, FaBars, FaTimes, FaAward, FaBook, FaBriefcase, FaCode, FaChartBar, FaBrain, FaDatabase, FaChartLine } from 'react-icons/fa'
+import { FaLinkedin, FaKaggle, FaEnvelope, FaBars, FaTimes, FaAward, FaBook, FaBriefcase, FaCode, FaChartBar, FaBrain, FaDatabase, FaChartLine, FaFilter } from 'react-icons/fa'
 import { motion, AnimatePresence } from 'framer-motion'
 
 // Remove the WatercolorBrushStroke component
@@ -259,7 +259,7 @@ const Skills = () => {
     { name: 'Data Analysis', icon: <FaChartBar />, color: 'bg-blue-500' },
     { name: 'Machine Learning', icon: <FaBrain />, color: 'bg-green-500' },
     { name: 'Python', icon: <FaCode />, color: 'bg-yellow-500' },
-    { name: 'R', icon: <FaCode />, color: 'bg-red-500' },
+    { name: 'Data Cleaning', icon: <FaFilter />, color: 'bg-red-500' },
     { name: 'SQL', icon: <FaDatabase />, color: 'bg-purple-500' },
     { name: 'Tableau', icon: <FaChartBar />, color: 'bg-indigo-500' },
     { name: 'TensorFlow', icon: <FaBrain />, color: 'bg-pink-500' },
