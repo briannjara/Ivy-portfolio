@@ -256,8 +256,8 @@ const About = () => {
 
 const Skills = () => {
   const skills = [
-    { name: 'Data Analysis', icon: 'path/to/data-analysis-icon.svg', color: 'bg-blue-500' },
-    { name: 'Machine Learning', icon: 'path/to/machine-learning-icon.svg', color: 'bg-green-500' },
+    { name: 'Data Analysis', icon: <FaChartBar />, color: 'bg-blue-500' },
+    { name: 'Machine Learning', icon: <FaBrain />, color: 'bg-green-500' },
     { name: 'Python', icon: <FaCode />, color: 'bg-yellow-500' },
     { name: 'R', icon: <FaCode />, color: 'bg-red-500' },
     { name: 'SQL', icon: <FaDatabase />, color: 'bg-purple-500' },
@@ -285,15 +285,8 @@ const Skills = () => {
               transition={{ duration: 0.5, delay: index * 0.1 }}
               whileHover={{ scale: 1.05, rotate: [0, -5, 5, 0] }}
             >
-              <motion.img
-                src={skill.icon}
-                alt={skill.name}
-                className="w-12 h-12 mb-4 mx-auto"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 260, damping: 20, delay: index * 0.1 + 0.3 }}
-              />
-              <span className="text-lg text-white font-semibold">{skill.name}</span>
+              <div className="text-4xl text-white mb-4">{skill.icon}</div>
+              <h3 className="text-xl font-bold text-white">{skill.name}</h3>
             </motion.div>
           ))}
         </div>
