@@ -2,6 +2,39 @@ import React, { useState, useEffect, useRef } from 'react'
 import { FaLinkedin, FaKaggle, FaEnvelope, FaBars, FaTimes, FaAward, FaBook, FaBriefcase, FaCode, FaChartBar, FaBrain, FaDatabase, FaChartLine, FaFilter, FaChartPie, FaTable } from 'react-icons/fa'
 import { motion, AnimatePresence, useInView } from 'framer-motion'
 
+// Add this custom hook at the top of your file, after the imports
+const useScrollAnimation = () => {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(entry.target);
+        }
+      },
+      {
+        threshold: 0.1,
+        rootMargin: "-50px",
+      }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => {
+      if (ref.current) {
+        observer.unobserve(ref.current);
+      }
+    };
+  }, []);
+
+  return [ref, isVisible];
+};
+
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -292,7 +325,9 @@ const About = () => {
   )
 }
 
+// Update the Skills component
 const Skills = () => {
+  const [ref, isVisible] = useScrollAnimation();
   const skills = [
     { name: 'Data Analysis', icon: <FaChartBar />, color: 'bg-blue-500' },
     { name: 'Machine Learning', icon: <FaBrain />, color: 'bg-green-500' },
@@ -305,46 +340,41 @@ const Skills = () => {
   ]
 
   return (
-    <AnimatedSection animationType="fade">
-      <section id="skills" className="relative bg-gradient-to-t from-white to-lavender-100 py-20">
-        <div className="absolute inset-0 opacity-20">
-          <img src="path/to/geometric-pattern.svg" alt="" className="w-full h-full object-cover" />
-        </div>
+    <section id="skills" className="relative bg-gradient-to-t from-white to-lavender-100 py-20">
+      <div className="absolute inset-0 opacity-20">
+        <img src="path/to/geometric-pattern.svg" alt="" className="w-full h-full object-cover" />
+      </div>
 
-        <div className="container mx-auto px-4">
-          <motion.h2
-            className="text-3xl md:text-4xl font-bold text-lavender-800 mb-12 text-center"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            Skills
-          </motion.h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {skills.map((skill, index) => (
-              <motion.div
-                key={skill.name}
-                className={`${skill.color} p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-all duration-300`}
-                initial={{ opacity: 0, scale: 0.5 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true, amount: 0.8 }}
-                transition={{ 
-                  duration: 0.5, 
-                  delay: index * 0.1,
-                  type: "spring",
-                  stiffness: 260,
-                  damping: 20
-                }}
-                whileHover={{ scale: 1.05, rotate: [0, -3, 3, 0] }}
-              >
-                <div className="text-4xl text-white mb-4">{skill.icon}</div>
-                <h3 className="text-xl font-bold text-white">{skill.name}</h3>
-              </motion.div>
-            ))}
-          </div>
+      <div className="container mx-auto px-4">
+        <motion.h2
+          className="text-3xl md:text-4xl font-bold text-lavender-800 mb-12 text-center"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          Skills
+        </motion.h2>
+        <div ref={ref} className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {skills.map((skill, index) => (
+            <motion.div
+              key={skill.name}
+              className={`${skill.color} p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-all duration-300`}
+              initial={{ opacity: 0, y: 50 }}
+              animate={isVisible ? { opacity: 1, y: 0 } : {}}
+              transition={{ 
+                duration: 0.6, 
+                delay: index * 0.1,
+                ease: "easeOut"
+              }}
+              whileHover={{ scale: 1.05, rotate: [0, -2, 2, 0] }}
+            >
+              <div className="text-4xl text-white mb-4">{skill.icon}</div>
+              <h3 className="text-xl font-bold text-white">{skill.name}</h3>
+            </motion.div>
+          ))}
         </div>
-      </section>
-    </AnimatedSection>
+      </div>
+    </section>
   )
 }
 
