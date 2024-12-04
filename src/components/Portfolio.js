@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { FaLinkedin, FaKaggle, FaEnvelope, FaBars, FaTimes, FaAward, FaBook, FaBriefcase, FaCode, FaChartBar, FaBrain, FaDatabase, FaChartLine, FaFilter, FaChartPie, FaTable } from 'react-icons/fa'
 import { motion, AnimatePresence, useInView } from 'framer-motion'
+import Projects from './Projects';
 
 // Add this custom hook at the top of your file, after the imports
 const useScrollAnimation = () => {
@@ -37,6 +38,7 @@ const useScrollAnimation = () => {
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const menuVariants = {
     closed: {
@@ -58,12 +60,16 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    // Add smooth scrolling behavior to the entire page
-    document.documentElement.style.scrollBehavior = 'smooth';
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
 
-    // Clean up the effect
+    document.documentElement.style.scrollBehavior = 'smooth';
+    window.addEventListener('scroll', handleScroll);
+
     return () => {
       document.documentElement.style.scrollBehavior = 'auto';
+      window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
@@ -75,80 +81,109 @@ const Navbar = () => {
       const elementPosition = targetElement.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - headerHeight;
 
-      // Close the mobile menu
       setIsMenuOpen(false);
 
-      // Use setTimeout to ensure the menu closes before scrolling
       setTimeout(() => {
         window.scrollTo({
           top: offsetPosition,
           behavior: 'smooth'
         });
-      }, 300); // Adjust this delay if needed to match your menu closing animation duration
+      }, 300);
     }
   };
 
   const navItems = ['Home', 'About', 'Skills', 'Projects', 'Education', 'Contact'];
 
   return (
-    <header className="bg-gradient-to-r from-lavender-800 to-lavender-600 text-white sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-6 flex justify-between items-center">
-        <h1 className="text-2xl font-bold tracking-wider">Ivy Atieng</h1>
-        <nav className="hidden md:flex space-x-6">
-          {navItems.map((item) => (
-            <a
-              key={item}
-              href={`#${item.toLowerCase()}`}
-              className="hover:text-lavender-300 transition-colors duration-200"
-              onClick={(e) => handleNavClick(e, item.toLowerCase())}
-            >
-              {item}
-            </a>
-          ))}
-        </nav>
-        <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="md:hidden">
-          {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
-        </button>
-      </div>
-
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            className="md:hidden bg-lavender-700 overflow-hidden"
-            initial="closed"
-            animate="open"
-            exit="closed"
-            variants={menuVariants}
+    <header 
+      className={`fixed w-full top-0 z-50 transition-all duration-300 ${
+        isScrolled 
+          ? 'bg-[#0B1120]/80 backdrop-blur-lg shadow-lg' 
+          : 'bg-transparent'
+      }`}
+    >
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex justify-between items-center">
+          <motion.h1 
+            className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400"
+            whileHover={{ scale: 1.05 }}
           >
-            <nav className="flex flex-col space-y-4 p-4">
-              {navItems.map((item) => (
-                <motion.a
-                  key={item}
-                  href={`#${item.toLowerCase()}`}
-                  className="hover:text-lavender-300 transition-colors duration-200"
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 * navItems.indexOf(item) }}
-                  onClick={(e) => handleNavClick(e, item.toLowerCase())}
-                >
-                  {item}
-                </motion.a>
-              ))}
-            </nav>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            Ivy Atieng
+          </motion.h1>
+
+          <nav className="hidden md:flex items-center space-x-1">
+            {navItems.map((item) => (
+              <motion.a
+                key={item}
+                href={`#${item.toLowerCase()}`}
+                className="relative px-4 py-2 text-gray-300 hover:text-white transition-colors duration-200 rounded-lg group"
+                onClick={(e) => handleNavClick(e, item.toLowerCase())}
+                whileHover={{ scale: 1.05 }}
+              >
+                <span className="relative z-10">{item}</span>
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-emerald-500/10 rounded-lg opacity-0 group-hover:opacity-100"
+                  initial={false}
+                  transition={{ duration: 0.2 }}
+                />
+              </motion.a>
+            ))}
+          </nav>
+
+          <motion.button 
+            onClick={() => setIsMenuOpen(!isMenuOpen)} 
+            className="md:hidden text-white p-2 rounded-lg hover:bg-white/10"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+          </motion.button>
+        </div>
+
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              className="md:hidden mt-4 rounded-xl bg-[#0B1120]/95 backdrop-blur-lg border border-white/10"
+              initial="closed"
+              animate="open"
+              exit="closed"
+              variants={menuVariants}
+            >
+              <nav className="flex flex-col p-4">
+                {navItems.map((item, index) => (
+                  <motion.a
+                    key={item}
+                    href={`#${item.toLowerCase()}`}
+                    className="px-4 py-3 text-gray-300 hover:text-white transition-colors duration-200 rounded-lg hover:bg-white/5"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    onClick={(e) => handleNavClick(e, item.toLowerCase())}
+                  >
+                    {item}
+                  </motion.a>
+                ))}
+              </nav>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </header>
-  )
-}
+  );
+};
 
 // Update the AnimatedGradientBackground component
 const AnimatedGradientBackground = () => (
-  <div className="absolute inset-0 bg-gradient-to-br from-lavender-800 via-lavender-600 to-purple-500 animate-gradient-background bg-[length:400%_400%]"></div>
+  <div className="absolute inset-0 bg-gradient-to-br from-[#0B1120] via-[#111827] to-[#1F2937] animate-gradient-background bg-[length:400%_400%]">
+    {/* Add subtle animated overlay */}
+    <div className="absolute inset-0 opacity-20">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/10 via-emerald-500/5 to-transparent"></div>
+    </div>
+  </div>
 )
 
 const Home = () => (
-  <section id="home" className="relative overflow-hidden">
+  <section id="home" className="relative overflow-hidden min-h-screen flex items-center">
     <div className="absolute inset-0">
       <AnimatedGradientBackground />
     </div>
@@ -159,14 +194,18 @@ const Home = () => (
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
       >
-        <h2 className="text-5xl md:text-6xl font-bold mb-6 leading-tight text-white">Ivy Atieng</h2>
-        <p className="text-xl md:text-2xl mb-8 text-white">Data Scientist | Data Analyst | Machine Learning</p>
-        <p className="text-lg mb-8 text-white">Nairobi, Kenya</p>
+        <h2 className="text-5xl md:text-6xl font-bold mb-6 leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-100 to-gray-300">
+          Ivy Atieng
+        </h2>
+        <p className="text-xl md:text-2xl mb-8 text-gray-300">
+          Data Scientist | Data Analyst | Machine Learning
+        </p>
+        <p className="text-lg mb-8 text-gray-400">Nairobi, Kenya</p>
         <div className="flex flex-wrap gap-4 justify-center md:justify-start">
           <motion.a
             href="https://www.linkedin.com/in/ivy-atieng/"
-            className="bg-white text-lavender-800 px-6 py-2 rounded-full transition flex items-center hover:bg-lavender-100"
-            whileHover={{ scale: 1.05 }}
+            className="bg-white/5 backdrop-blur-sm text-white px-6 py-2 rounded-full transition flex items-center hover:bg-white/10 border border-white/10 hover:border-white/20"
+            whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(255,255,255,0.1)" }}
             whileTap={{ scale: 0.95 }}
             target='_blank'
           >
@@ -175,8 +214,8 @@ const Home = () => (
           </motion.a>
           <motion.a
             href="https://www.kaggle.com/elynevn"
-            className="bg-white text-lavender-800 px-6 py-2 rounded-full transition flex items-center hover:bg-lavender-100"
-            whileHover={{ scale: 1.05 }}
+            className="bg-white/5 backdrop-blur-sm text-white px-6 py-2 rounded-full transition flex items-center hover:bg-white/10 border border-white/10 hover:border-white/20"
+            whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(255,255,255,0.1)" }}
             whileTap={{ scale: 0.95 }}
             target='_blank'
           >
@@ -185,8 +224,8 @@ const Home = () => (
           </motion.a>
           <motion.a
             href="mailto:atiengivylisa@gmail.com"
-            className="bg-white text-lavender-800 px-6 py-2 rounded-full transition flex items-center hover:bg-lavender-100"
-            whileHover={{ scale: 1.05 }}
+            className="bg-white/5 backdrop-blur-sm text-white px-6 py-2 rounded-full transition flex items-center hover:bg-white/10 border border-white/10 hover:border-white/20"
+            whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(255,255,255,0.1)" }}
             whileTap={{ scale: 0.95 }}
             target='_blank'
           >
@@ -202,8 +241,13 @@ const Home = () => (
         transition={{ duration: 0.8 }}
       >
         <div className="relative">
-          <img src="https://www.datascienceportfol.io/static/profile_pics/pr0_AD3964876E6CB84DF1EB.png" alt="Ivy Atieng" className="rounded-full w-64 h-64 md:w-80 md:h-80 object-cover border-4 border-white shadow-lg" />
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-lavender-600 to-lavender-400 opacity-40"></div>
+          <img 
+            src="logo1.png" 
+            alt="Ivy Atieng" 
+            className="w-96 h-96 md:w-[500px] md:h-[500px] object-contain shadow-2xl bg-gradient-to-r from-transparent via-white/5 to-transparent backdrop-blur-sm rounded-xl"
+          />
+
+         
         </div>
       </motion.div>
     </div>
@@ -251,114 +295,220 @@ const About = () => {
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 }
-  }
+  };
+
+  const stats = [
+    { 
+      number: "2+", 
+      label: "Years Experience",
+      icon: <FaBriefcase className="text-2xl" />,
+      gradient: "from-neon-blue to-neon-purple"
+    },
+    { 
+      number: "10+", 
+      label: "Projects Completed",
+      icon: <FaCode className="text-2xl" />,
+      gradient: "from-neon-purple to-neon-pink"
+    },
+    { 
+      number: "5+", 
+      label: "ML Models Deployed",
+      icon: <FaBrain className="text-2xl" />,
+      gradient: "from-neon-pink to-neon-orange"
+    }
+  ];
 
   return (
-    <AnimatedSection animationType="slide">
-      <section id="about" className="relative bg-gradient-to-b from-white to-lavender-100 py-24">
-        <div className="container mx-auto px-4">
-          <motion.h2
-            className="text-4xl md:text-5xl font-bold text-lavender-800 mb-16 text-center"
-            initial="hidden"
-            animate="visible"
-            variants={fadeIn}
+    <section id="about" className="relative bg-black py-24">
+      {/* Background Effects */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#0B1120] via-[#111827] to-[#1F2937]">
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/10 via-emerald-500/5 to-transparent"></div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 relative z-10">
+        <motion.h2
+          className="text-4xl font-bold text-center mb-16 bg-clip-text text-transparent 
+            bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink"
+          initial="hidden"
+          animate="visible"
+          variants={fadeIn}
+          transition={{ duration: 0.6 }}
+        >
+          About Me
+        </motion.h2>
+
+        <div className="grid md:grid-cols-[1fr,auto] gap-12 max-w-6xl mx-auto">
+          {/* Content Column */}
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            About Me
-          </motion.h2>
-          <div className="md:flex items-center">
-            <motion.div
-              className="md:w-1/3 md:pr-12 mb-12 md:mb-0"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6 }}
-            >
-              <div className="relative max-w-xs mx-auto">
-                <img
-                  src="https://www.datascienceportfol.io/static/profile_pics/pr0_AD3964876E6CB84DF1EB.png"
-                  alt="Ivy Atieng"
-                  className="rounded-lg shadow-xl w-full h-auto hover:shadow-2xl transition-shadow duration-300"
-                />
-                <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-lavender-600 to-lavender-400 opacity-0 hover:opacity-40 transition-opacity duration-300"></div>
+            {/* Bio Cards */}
+            <div className="space-y-6">
+              <div className="relative p-6 rounded-xl bg-gradient-to-br from-purple-900/50 to-blue-900/50 backdrop-blur-sm">
+                <div className="absolute inset-0 bg-black bg-opacity-50 rounded-xl"></div>
+                <div className="relative z-10">
+                  <h3 className="text-xl font-semibold mb-4 bg-clip-text text-transparent 
+                    bg-gradient-to-r from-neon-blue to-neon-purple">
+                    Data Science Journey
+                  </h3>
+                  <p className="text-gray-300 leading-relaxed">
+                    As a passionate Data Scientist with expertise in Data Analysis and Machine Learning, 
+                    I bring a unique blend of analytical skills and creative problem-solving to every project. 
+                    My approach combines rigorous statistical methods with cutting-edge machine learning 
+                    techniques to extract meaningful insights from complex datasets.
+                  </p>
+                </div>
               </div>
-            </motion.div>
-            <motion.div
-              className="md:w-2/3"
-              initial="hidden"
-              animate="visible"
-              variants={fadeIn}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              <p className="text-lg text-gray-700 mb-6 leading-relaxed">
-                As a passionate Data Scientist with expertise in Data Analysis and Machine Learning, I bring a
-                unique blend of analytical skills and creative problem-solving to every project. My approach
-                combines rigorous statistical methods with cutting-edge machine learning techniques to
-                extract meaningful insights from complex datasets.
-              </p>
-              <p className="text-lg text-gray-700 mb-8 leading-relaxed">
-                With a strong foundation in mathematics and computer science, I excel at translating data-driven
-                insights into actionable strategies that drive business growth and innovation.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {[
-                  { icon: <FaAward />, title: "Expertise", description: "Data Analysis, Machine Learning, Visualization" },
-                  { icon: <FaBook />, title: "Education", description: "Data Science Bootcamp, Continuous Learning" },
-                  { icon: <FaBriefcase />, title: "Experience", description: "Emerging Data Scientist with Practical Projects" }
-                ].map((item, index) => (
-                  <motion.div
-                    key={item.title}
-                    className="bg-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <div className="text-lavender-600 text-3xl mb-2">{item.icon}</div>
-                    <h3 className="text-lg font-semibold text-lavender-800 mb-1">{item.title}</h3>
-                    <p className="text-sm text-gray-600">{item.description}</p>
-                  </motion.div>
-                ))}
+
+              <div className="relative p-6 rounded-xl bg-gradient-to-br from-pink-900/50 to-purple-900/50 backdrop-blur-sm">
+                <div className="absolute inset-0 bg-black bg-opacity-50 rounded-xl"></div>
+                <div className="relative z-10">
+                  <h3 className="text-xl font-semibold mb-4 bg-clip-text text-transparent 
+                    bg-gradient-to-r from-neon-pink to-neon-purple">
+                    Technical Expertise
+                  </h3>
+                  <p className="text-gray-300 leading-relaxed">
+                    With a strong foundation in mathematics and computer science, I excel at translating 
+                    data-driven insights into actionable strategies that drive business growth and innovation. 
+                    My expertise spans across machine learning, statistical analysis, and data visualization.
+                  </p>
+                </div>
               </div>
-            </motion.div>
-          </div>
+            </div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-3 gap-4 mt-8">
+              {stats.map((stat, index) => (
+                <motion.div
+                  key={stat.label}
+                  className="relative p-4 rounded-xl bg-black/50 backdrop-blur-sm border border-white/10
+                    hover:border-white/20 transition-all duration-300"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ y: -5 }}
+                >
+                  <div className={`text-2xl font-bold bg-clip-text text-transparent 
+                    bg-gradient-to-r ${stat.gradient}`}>
+                    {stat.number}
+                  </div>
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className="text-gray-400 text-sm">{stat.label}</span>
+                    <span className="text-neon-purple">{stat.icon}</span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Image Column */}
+          <motion.div
+            className="relative"
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+        
+            
+            {/* Background glow effect */}
+            <div className="absolute -inset-4 bg-gradient-to-r from-neon-blue/20 via-neon-purple/20 to-neon-pink/20 
+              blur-2xl -z-10 rounded-full animate-pulse"></div>
+          </motion.div>
         </div>
-      </section>
-    </AnimatedSection>
-  )
-}
+      </div>
+    </section>
+  );
+};
 
 // Update the Skills component
 const Skills = () => {
   const [ref, isVisible] = useScrollAnimation();
   const skills = [
-    { name: 'Data Analysis', icon: <FaChartBar />, color: 'bg-blue-500' },
-    { name: 'Machine Learning', icon: <FaBrain />, color: 'bg-green-500' },
-    { name: 'Python', icon: <FaCode />, color: 'bg-yellow-500' },
-    { name: 'Data Cleaning', icon: <FaFilter />, color: 'bg-red-500' },
-    { name: 'PowerBI', icon: <FaChartPie />, color: 'bg-purple-500' },
-    { name: 'Tableau', icon: <FaTable />, color: 'bg-indigo-500' },
-    { name: 'Data Mining', icon: <FaDatabase />, color: 'bg-pink-500' },
-    { name: 'Data Visualization', icon: <FaChartLine />, color: 'bg-teal-500' },
-  ]
+    { 
+      name: 'Data Analysis', 
+      icon: <FaChartBar />, 
+      gradient: 'from-orange-400 to-pink-600',
+      glow: 'hover:shadow-orange-500/50'
+    },
+    { 
+      name: 'Machine Learning', 
+      icon: <FaBrain />, 
+      gradient: 'from-blue-400 to-purple-600',
+      glow: 'hover:shadow-blue-500/50'
+    },
+    { 
+      name: 'Python', 
+      icon: <FaCode />, 
+      gradient: 'from-green-400 to-teal-600',
+      glow: 'hover:shadow-green-500/50'
+    },
+    { 
+      name: 'Data Cleaning', 
+      icon: <FaFilter />, 
+      gradient: 'from-red-400 to-rose-600',
+      glow: 'hover:shadow-red-500/50'
+    },
+    { 
+      name: 'PowerBI', 
+      icon: <FaChartPie />, 
+      gradient: 'from-purple-400 to-indigo-600',
+      glow: 'hover:shadow-purple-500/50'
+    },
+    { 
+      name: 'Tableau', 
+      icon: <FaTable />, 
+      gradient: 'from-indigo-400 to-cyan-600',
+      glow: 'hover:shadow-indigo-500/50'
+    },
+    { 
+      name: 'Data Mining', 
+      icon: <FaDatabase />, 
+      gradient: 'from-pink-400 to-rose-600',
+      glow: 'hover:shadow-pink-500/50'
+    },
+    { 
+      name: 'Data Visualization', 
+      icon: <FaChartLine />, 
+      gradient: 'from-cyan-400 to-blue-600',
+      glow: 'hover:shadow-cyan-500/50'
+    },
+  ];
 
   return (
-    <section id="skills" className="relative bg-gradient-to-t from-white to-lavender-100 py-20">
+    <section id="skills" className="relative bg-gradient-to-br from-[#0B1120] via-[#111827] to-[#1F2937] py-20">
       <div className="absolute inset-0 opacity-20">
-        <img src="path/to/geometric-pattern.svg" alt="" className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/10 via-emerald-500/5 to-transparent"></div>
       </div>
-
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 relative z-10">
         <motion.h2
-          className="text-3xl md:text-4xl font-bold text-lavender-800 mb-12 text-center"
+          className="text-3xl md:text-4xl font-bold text-white mb-12 text-center"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
           Skills
         </motion.h2>
-        <div ref={ref} className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div ref={ref} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
           {skills.map((skill, index) => (
             <motion.div
               key={skill.name}
-              className={`${skill.color} p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-all duration-300`}
+              className={`
+                relative bg-gray-800/50 backdrop-blur-sm 
+                rounded-xl p-6 
+                transform transition-all duration-300
+                hover:scale-105 hover:shadow-xl
+                ${skill.glow}
+                border border-transparent
+                hover:border-opacity-50
+                hover:border-white/20
+              `}
               initial={{ opacity: 0, y: 50 }}
               animate={isVisible ? { opacity: 1, y: 0 } : {}}
               transition={{ 
@@ -366,79 +516,36 @@ const Skills = () => {
                 delay: index * 0.1,
                 ease: "easeOut"
               }}
-              whileHover={{ scale: 1.05, rotate: [0, -2, 2, 0] }}
             >
-              <div className="text-4xl text-white mb-4">{skill.icon}</div>
-              <h3 className="text-xl font-bold text-white">{skill.name}</h3>
+              <div className={`
+                relative w-16 h-16 mx-auto mb-4
+                before:content-[''] before:absolute before:inset-0 
+                before:bg-gradient-to-br ${skill.gradient}
+                before:rounded-full before:opacity-20
+                before:transform before:scale-150
+                before:blur-xl
+              `}>
+                <div className={`
+                  absolute inset-0 bg-gradient-to-br ${skill.gradient}
+                  rounded-full opacity-75
+                `}/>
+                <div className="relative flex items-center justify-center w-full h-full text-white text-3xl">
+                  {skill.icon}
+                </div>
+              </div>
+              <h3 className={`
+                text-lg font-bold text-center text-white
+                bg-clip-text bg-gradient-to-br ${skill.gradient}
+              `}>
+                {skill.name}
+              </h3>
             </motion.div>
           ))}
         </div>
       </div>
     </section>
-  )
-}
-
-const Projects = () => {
-  const projects = [
-    {
-      title: 'Paris Olympics Sentiment Analysis',
-      description: 'Developed a machine learning model to analyze public sentiment around the 2024 Paris Olympics.',
-      image: 'https://www.datascienceportfol.io/static/profile_pics/pr0_7DAF46B7ADE9E6FB2119.jpg',
-      tags: ['Machine Learning', 'NLP', 'Sentiment Analysis'],
-    },
-    {
-      title: 'Apple & Google Products Sentiment Analysis',
-      description: 'Built a dashboard to analyze sentiment on Apple & Google products based on social media data.',
-      image: 'https://www.datascienceportfol.io/static/profile_pics/pr1_99A62A9E986C25C9B7F0.jpg',
-      tags: ['Data Visualization', 'Dashboard', 'Social Media Analysis'],
-    },
-  ]
-
-  return (
-    <AnimatedSection animationType="rotate">
-      <section id="projects" className="relative bg-gradient-to-b from-white to-lavender-100 py-24">
-        <div className="container mx-auto px-4">
-          <h2 className="text-4xl md:text-5xl font-bold text-lavender-800 mb-16 text-center">Projects</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            {projects.map((project, index) => (
-              <motion.div
-                key={project.title}
-                className="bg-white rounded-lg shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300"
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.2 }}
-                whileHover={{ scale: 1.03 }}
-              >
-                <div className="relative">
-                  <img src={project.image} alt={project.title} className="w-full h-64 object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60"></div>
-                  <h3 className="absolute bottom-4 left-4 text-2xl font-bold text-white">{project.title}</h3>
-                </div>
-                <div className="p-6">
-                  <p className="text-gray-600 mb-4">{project.description}</p>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {project.tags.map((tag) => (
-                      <span key={tag} className="bg-lavender-100 text-lavender-800 px-2 py-1 rounded-full text-sm">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                  <motion.a
-                    href="#"
-                    className="inline-block text-lavender-600 hover:text-lavender-800 font-medium transition-colors duration-200"
-                    whileHover={{ x: 5 }}
-                  >
-                    Read more →
-                  </motion.a>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-    </AnimatedSection>
-  )
-}
+  );
+};
 
 const Education = () => {
   const education = [
@@ -448,7 +555,9 @@ const Education = () => {
       institutionLink: 'https://moringaschool.com/',
       year: 'Feb 2024 - August 2024',
       description: 'Experienced data scientist skilled in data manipulation, statistical analysis, and machine learning. Proficient in Python, SQL, and data visualization tools, with a strong ability to drive actionable insights and strategic decision',
-      icon: <FaBrain className="text-3xl text-lavender-600" />,
+      skills: ['Python', 'Machine Learning', 'Data Analysis', 'SQL'],
+      icon: <FaBrain className="text-3xl" />,
+      gradient: "from-purple-900/50 to-blue-900/50"
     },
     {
       degree: 'Data Visualization Course',
@@ -456,109 +565,259 @@ const Education = () => {
       institutionLink: 'https://www.coursera.org/',
       year: 'Sep 2023 - Dec 2023',
       description: 'Skilled in data visualization and analysis, adept at using tools like Python, Tableau, and SQL to transform complex data into actionable insights through clear, compelling visualizations and detailed analytical techniques.',
-      icon: <FaChartBar className="text-3xl text-lavender-600" />,
+      skills: ['Tableau', 'PowerBI', 'Data Visualization', 'Analytics'],
+      icon: <FaChartBar className="text-3xl" />,
+      gradient: "from-blue-900/50 to-cyan-900/50"
     },
-  ]
+  ];
 
   return (
-    <AnimatedSection>
-      <section id="education" className="relative bg-gradient-to-t from-white to-lavender-100 py-24">
-        <div className="container mx-auto px-4">
-          <h2 className="text-4xl md:text-5xl font-bold text-lavender-800 mb-16 text-center">Education</h2>
-          <div className="space-y-12 max-w-4xl mx-auto">
-            {education.map((edu, index) => (
-              <motion.div
-                key={edu.degree}
-                className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-lavender-200"
-                variants={{
-                  hidden: { opacity: 0, x: -50 },
-                  visible: { opacity: 1, x: 0 }
-                }}
-              >
-                <div className="flex flex-col md:flex-row md:items-center mb-6">
-                  <div className="bg-lavender-100 p-4 rounded-full mb-4 md:mb-0 md:mr-6 inline-flex">
+    <section id="education" className="relative bg-black py-24">
+      {/* Background gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#0B1120] via-[#111827] to-[#1F2937]">
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/10 via-emerald-500/5 to-transparent"></div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 relative z-10">
+        <h2 className="text-4xl font-bold text-center mb-16 bg-clip-text text-transparent 
+          bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink">
+          Education Journey
+        </h2>
+
+        <div className="max-w-6xl mx-auto space-y-8">
+          {education.map((edu, index) => (
+            <motion.div
+              key={edu.degree}
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: index * 0.2 }}
+              className={`relative p-6 rounded-xl transition-all duration-300
+                bg-gradient-to-br ${edu.gradient} bg-opacity-10 backdrop-blur-sm
+                hover:shadow-card-hover group`}
+            >
+              <div className="absolute inset-0 bg-black bg-opacity-50 rounded-xl z-0"></div>
+              
+              <div className="relative z-10 grid md:grid-cols-[auto,1fr] gap-6">
+                {/* Icon Column */}
+                <div className="flex flex-col items-center md:items-start space-y-4">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-neon-blue to-neon-purple 
+                    flex items-center justify-center text-white">
                     {edu.icon}
                   </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-lavender-800 mb-1">{edu.degree}</h3>
-                    <a
-                      href={edu.institutionLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-lavender-600 text-lg hover:text-lavender-800 transition-colors duration-200"
-                    >
-                      {edu.institution}
-                    </a>
-                    <p className="text-gray-600 mt-1">{edu.year}</p>
+                  <div className="h-full w-0.5 bg-gradient-to-b from-neon-purple to-transparent 
+                    hidden md:block"></div>
+                </div>
+
+                {/* Content Column */}
+                <div>
+                  <h3 className="text-2xl font-bold mb-2 bg-clip-text text-transparent 
+                    bg-gradient-to-r from-neon-blue to-neon-pink">
+                    {edu.degree}
+                  </h3>
+                  
+                  <a href={edu.institutionLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-neon-blue hover:text-neon-pink transition-colors duration-300">
+                    {edu.institution}
+                  </a>
+                  
+                  <p className="text-gray-400 mt-1 mb-4">{edu.year}</p>
+                  <p className="text-gray-300 mb-6">{edu.description}</p>
+
+                  <div className="flex flex-wrap gap-2">
+                    {edu.skills.map((skill, idx) => (
+                      <span
+                        key={skill}
+                        className="px-3 py-1 text-sm rounded-full bg-lavender-800 
+                          text-lavender-100 group-hover:animate-tag-bounce"
+                        style={{ animationDelay: `${idx * 0.1}s` }}
+                      >
+                        {skill}
+                      </span>
+                    ))}
                   </div>
                 </div>
-                <p className="text-gray-700 leading-relaxed mb-4">{edu.description}</p>
-                <div className="w-full h-1 bg-lavender-200 rounded-full overflow-hidden">
-                  <motion.div
-                    className="w-full h-full bg-gradient-to-r from-lavender-400 to-lavender-600"
-                    initial={{ x: "-100%" }}
-                    animate={{ x: "100%" }}
-                    transition={{
-                      repeat: Infinity,
-                      duration: 2,
-                      ease: "linear"
-                    }}
-                  ></motion.div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-    </AnimatedSection>
-  )
-}
-
-const Contact = () => (
-  <AnimatedSection animationType="slide">
-    <section id="contact" className="relative bg-gradient-to-b from-white to-lavender-100 py-24">
-      <div className="container mx-auto px-4 text-center">
-        <h2 className="text-3xl md:text-4xl font-bold text-lavender-800 mb-12">Get in Touch</h2>
-        <div className="flex flex-wrap justify-center gap-6">
-          <a href="https://www.linkedin.com/in/ivy-atieng/" target='_blank' className="bg-lavender-600 text-white px-8 py-3 rounded-full hover:bg-lavender-700 transition-colors duration-300 flex items-center">
-            <FaLinkedin className="mr-2" size={20} /> LinkedIn
-          </a>
-          <a href="https://www.kaggle.com/elynevn" target='_blank' className="bg-lavender-600 text-white px-8 py-3 rounded-full hover:bg-lavender-700 transition-colors duration-300 flex items-center">
-            <FaKaggle className="mr-2" size={20} /> Kaggle
-          </a>
-          <a href="mailto:atiengivylisa@gmail.com" target='_blank' className="bg-lavender-600 text-white px-8 py-3 rounded-full hover:bg-lavender-700 transition-colors duration-300 flex items-center">
-            <FaEnvelope className="mr-2" size={20} /> Email
-          </a>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>
-  </AnimatedSection>
-)
+  );
+};
+
+const Contact = () => (
+  <section id="contact" className="relative bg-black py-24">
+    {/* Background Effects */}
+    <div className="absolute inset-0 bg-gradient-to-br from-[#0B1120] via-[#111827] to-[#1F2937]">
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/10 via-emerald-500/5 to-transparent"></div>
+      </div>
+    </div>
+
+    <div className="container mx-auto px-4 relative z-10">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="text-center mb-12"
+      >
+        <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent 
+          bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink">
+          Get in Touch
+        </h2>
+        <p className="text-gray-400 max-w-2xl mx-auto">
+          Let's connect and explore how we can work together to bring your data science projects to life.
+        </p>
+      </motion.div>
+
+      <div className="max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            {
+              icon: <FaLinkedin size={24} />,
+              title: "LinkedIn",
+              description: "Connect professionally",
+              link: "https://www.linkedin.com/in/ivy-atieng/",
+              gradient: "from-blue-600 to-blue-400"
+            },
+            {
+              icon: <FaKaggle size={24} />,
+              title: "Kaggle",
+              description: "Check my competitions",
+              link: "https://www.kaggle.com/elynevn",
+              gradient: "from-cyan-600 to-cyan-400"
+            },
+            {
+              icon: <FaEnvelope size={24} />,
+              title: "Email",
+              description: "Direct message",
+              link: "mailto:atiengivylisa@gmail.com",
+              gradient: "from-purple-600 to-pink-400"
+            }
+          ].map((item, index) => (
+            <motion.a
+              key={item.title}
+              href={item.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative group"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+            >
+              <div className="relative p-6 rounded-xl bg-black/50 backdrop-blur-sm border border-white/10 
+                transition-all duration-300 group-hover:border-white/20
+                hover:shadow-card-hover"
+              >
+                {/* Gradient overlay */}
+                <div className={`absolute inset-0 rounded-xl bg-gradient-to-br ${item.gradient} 
+                  opacity-0 group-hover:opacity-10 transition-opacity duration-300`}
+                />
+                
+                {/* Content */}
+                <div className="relative z-10 flex flex-col items-center">
+                  <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${item.gradient} 
+                    flex items-center justify-center text-white mb-4`}>
+                    {item.icon}
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-2">{item.title}</h3>
+                  <p className="text-gray-400 text-sm">{item.description}</p>
+                  
+                  {/* Animated arrow */}
+                  <motion.span 
+                    className="text-white mt-4 opacity-0 group-hover:opacity-100 transition-opacity"
+                    initial={{ x: 0 }}
+                    whileHover={{ x: 5 }}
+                  >
+                    →
+                  </motion.span>
+                </div>
+              </div>
+            </motion.a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+);
 
 const Footer = () => {
   return (
-    <footer className="relative bg-lavender-800 text-white py-8">
-      <div className="container mx-auto px-4 text-center">
-        <p>&copy; 2024 Ivy Atieng. All rights reserved.</p>
-        <div className="mt-4">
-          <a href="#home" className="text-lavender-300 hover:text-white transition-colors duration-200">Back to top</a>
+    <footer className="relative bg-[#0B1120] text-white py-12">
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+      
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="max-w-6xl mx-auto">
+          {/* Top section */}
+          <div className="flex flex-col md:flex-row justify-between items-center mb-8 pb-8 border-b border-white/10">
+            <motion.h2 
+              className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r 
+                from-neon-blue to-neon-purple mb-4 md:mb-0"
+              whileHover={{ scale: 1.05 }}
+            >
+              Ivy Atieng
+            </motion.h2>
+            
+            <nav className="flex gap-6">
+              {['Home', 'About', 'Skills', 'Projects', 'Education', 'Contact'].map((item) => (
+                <motion.a
+                  key={item}
+                  href={`#${item.toLowerCase()}`}
+                  className="text-gray-400 hover:text-white transition-colors duration-300"
+                  whileHover={{ y: -2 }}
+                >
+                  {item}
+                </motion.a>
+              ))}
+            </nav>
+          </div>
+
+          {/* Bottom section */}
+          <div className="flex flex-col md:flex-row justify-between items-center text-gray-400 text-sm">
+            <p>&copy; 2024 Ivy Atieng. All rights reserved.</p>
+            
+            <div className="flex gap-6 mt-4 md:mt-0">
+              <motion.a
+                href="#"
+                className="hover:text-white transition-colors duration-300"
+                whileHover={{ scale: 1.1 }}
+              >
+                Privacy Policy
+              </motion.a>
+              <motion.a
+                href="#"
+                className="hover:text-white transition-colors duration-300"
+                whileHover={{ scale: 1.1 }}
+              >
+                Terms of Service
+              </motion.a>
+            </div>
+          </div>
         </div>
       </div>
     </footer>
-  )
-}
+  );
+};
 
-const Portfolio = () => (
-  <div className="font-sans">
-    <Navbar />
-    <Home />
-    <About />
-    <Skills />
-    <Projects />
-    <Education />
-    <Contact />
-    <Footer />
-  </div>
-)
+const Portfolio = () => {
+  return (
+    <div className="min-h-screen bg-black">
+      <Navbar />
+      <Home />
+      <About />
+      <Skills />
+      <Projects />
+      <Education />
+      <Contact />
+      <Footer />
+    </div>
+  );
+};
 
 export default Portfolio
