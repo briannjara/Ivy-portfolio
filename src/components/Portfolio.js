@@ -92,7 +92,7 @@ const Navbar = () => {
     }
   };
 
-  const navItems = ['Home', 'About', 'Skills', 'Projects', 'Education', 'Contact'];
+  const navItems = ['Home', 'About', 'Skills', 'Education', 'Contact'];
 
   return (
     <header 
@@ -138,7 +138,7 @@ const Navbar = () => {
           >
             {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
           </motion.button>
-        </div>
+        </div>r
 
         <AnimatePresence>
           {isMenuOpen && (
@@ -240,14 +240,12 @@ const Home = () => (
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.8 }}
       >
-        <div className="relative">
+        <div className="relative w-96 h-96 md:w-[500px] md:h-[500px]">
           <img 
-            src="logo1.png" 
+            src="/ivy.png" 
             alt="Ivy Atieng" 
-            className="w-96 h-96 md:w-[500px] md:h-[500px] object-contain shadow-2xl bg-gradient-to-r from-transparent via-white/5 to-transparent backdrop-blur-sm rounded-xl"
+            className="w-full h-full object-contain"
           />
-
-         
         </div>
       </motion.div>
     </div>
